@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Recommendation</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-image: url('static/images/tamplte.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 50px;
+            max-width: 700px;
+        }
+
+        .form-group label {
+            font-size: 1rem;
+        }
+
+        .form-control {
+            font-size: 1rem;
+            height: 40px;
+        }
+
+        h2 {
+            font-size: 2rem;
+        }
+
+        .btn-success {
+            font-size: 1.2rem;
+            padding: 12px;
+        }
+
+        #cropResult {
+            font-size: 1rem;
+            height: 40px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-5 d-flex justify-content-center">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Crop Recommendation System </h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form id="cropForm">
+                        <div class="form-group">
+                            <label for="soilColor">Soil Color:</label>
+                            <select class="form-control" id="soilColor" name="soilColor" required>
+                                <option value="">Select Soil Color</option>
+                                <option value="Black">Black</option>
+                                <option value="Red">Red</option>
+                                <option value="Dark Brown">Dark Brown</option>
+                                <option value="Reddish Brown">Reddish Brown</option>
+                                <option value="Light Brown">Light Brown</option>
+                                <option value="Medium Brown">Medium Brown</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="nitrogen">Nitrogen:(20 to 150)</label>
+                            <input type="number" class="form-control" id="nitrogen" name="nitrogen" min="20" max="150" step="0.1" placeholder="20-150" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phosphorus">Phosphorus: (10-90)</label>
+                            <input type="number" class="form-control" id="phosphorus" name="phosphorus" min="10" max="90" step="0.1" placeholder="10 to 90" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="potassium">Potassium: (5-150)</label>
+                            <input type="number" class="form-control" id="potassium" name="potassium" min="5" max="150" step="0.1" placeholder="5 to 150" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ph">pH: (5.5-8.5)</label>
+                            <input type="number" class="form-control" id="ph" name="ph" min="5.5" max="8.5" step="0.1" placeholder="5.5 to 8.5" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="rainfall">Rainfall: (300-1700)</label>
+                            <input type="number" class="form-control" id="rainfall" name="rainfall" min="300" max="1700" step="0.1" placeholder="300 to 1700 mm" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="temperature">Temperature: (10-40)</label>
+                            <input type="number" class="form-control" id="temperature" name="temperature" min="10" max="40" step="0.1" placeholder="10 to 40°C" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fertilizer">Fertilizer:</label>
+                            <select class="form-control" id="fertilizer" name="fertilizer" required>
+                                <option value="">Select Fertilizer</option>
+                                <option value="Urea">Urea</option>
+                                <option value="DAP">DAP</option>
+                                <option value="MOP">MOP</option>
+                                <option value="19:19:19 NPK">19:19:19 NPK</option>
+                                <option value="SSP">SSP</option>
+                                <option value="Magnesium Sulphate">Magnesium Sulphate</option>
+                                <option value="10:26:26 NPK">10:26:26 NPK</option>
+                                <option value="50:26:26 NPK">50:26:26 NPK</option>
+                                <option value="Chelated Micronutrient">Chelated Micronutrient</option>
+                                <option value="12:32:16 NPK">12:32:16 NPK</option>
+                                <option value="Ferrous Sulphate">Ferrous Sulphate</option>
+                                <option value="13:32:26 NPK">13:32:26 NPK</option>
+                                <option value="Ammonium Sulphate">Ammonium Sulphate</option>
+                                <option value="10:10:10 NPK">10:10:10 NPK</option>
+                                <option value="Hydrated Lime">Hydrated Lime</option>
+                                <option value="White Potash">White Potash</option>
+                                <option value="20:20:20 NPK">20:20:20 NPK</option>
+                                <option value="18:46:00 NPK">18:46:00 NPK</option>
+                                <option value="Sulphur">Sulphur</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-success btn-block" onclick="predictCrop()">Submit</button>
+                    </form>
+                    <div class="form-group mt-3">
+                        <input type="text" class="form-control" id="cropResult" placeholder="Recommended Crop" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function validateForm(formId) {
+            var form = document.getElementById(formId);
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return false;
+            }
+            return true;
+        }
+
+        function predictCrop() {
+            // Validate form before submission
+            if (!validateForm('cropForm')) return;
+
+            // Get form data
+            var formData = $('#cropForm').serializeArray();
+            var data = {};
+            formData.forEach(function (item) {
+                data[item.name] = item.value;
+            });
+
+            // Make AJAX request to server
+            $.ajax({
+                url: '/predict_crop',
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                success: function (response) {
+                    $('#cropResult').val('Recommended Crop: ' + response.crop);
+                },
+                error: function (xhr) {
+                    var errorMessage = 'Error: ';
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMessage += xhr.responseJSON.error;
+                    } else {
+                        errorMessage += xhr.responseText || 'Unknown error occurred';
+                    }
+                    $('#cropResult').val(errorMessage);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
